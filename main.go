@@ -19,8 +19,7 @@ func verifyWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if len(mode) > 0 && len(token) > 0 {
 		if mode == "subscribe" && token == "mytesttoken" {
 			w.WriteHeader(http.StatusOK)
-			resJson, _ := json.Marshal(challenge)
-			w.Write(resJson)
+			w.Write([]byte(challenge))
 			log.Println("Hurray")
 			return
 
