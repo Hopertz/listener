@@ -36,7 +36,7 @@ func verifyWebhookHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func webHookEventHandler(w http.ResponseWriter, r *http.Request) {
-	var notification webhooks.Notification
+	var notification webhooks.WebhookMessage
 	defer r.Body.Close()
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&notification)
