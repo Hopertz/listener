@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
-	hooks "listener.hopertz.me/webhooks"
+	hooks "github.com/piusalfred/whatsapp/webhooks"
 )
 
 type verifier struct {
