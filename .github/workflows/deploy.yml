@@ -1,4 +1,8 @@
 name: Go Test Build and Deploy
+env:
+  GO_VERSION: "1.20.1"
+  GOPRIVATE: "github.com/piusalfred/whatsapp"
+  GH_ACCESS_TOKEN: ${{ secrets.PTA}}
 
 on:
   push:
@@ -15,7 +19,12 @@ jobs:
       uses: actions/setup-go@v3
       with:
         go-version: 1.20.1
-          
+        
+    - name: Install private dependencies and public dependencies
+      run: |
+        git config --global url.https://$GH_ACCESS_TOKEN@github.com/.insteadOf https://github.com/
+        go mod tidy
+        
     - name: Test
       run: go test -v ./...
       
