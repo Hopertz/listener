@@ -10,8 +10,7 @@ import (
 	"os"
 
 	"github.com/julienschmidt/httprouter"
-	hooks "github.com/piusalfred/whatsapp/webhooks"
-	"listener.hopertz.me/webhooks"
+	hooks "listener.hopertz.me/webhooks"
 )
 
 type verifier struct {
@@ -71,54 +70,13 @@ func (h *handler) HandleEvent(ctx context.Context, writer http.ResponseWriter, r
 	return nil
 }
 
-func verifyWebhookHandler(w http.ResponseWriter, r *http.Request) {
-	key := r.URL.Query()
-
-	mode := key.Get("hub.mode")
-	token := key.Get("hub.verify_token")
-	challenge := key.Get("hub.challenge")
-
-	if len(mode) > 0 && len(token) > 0 {
-		if mode == "subscribe" && token == "mytesttoken" {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(challenge))
-			log.Println("Hurray")
-			return
-
-		} else {
-			w.WriteHeader(http.StatusForbidden)
-			log.Println("forbiden")
-			return
-		}
-
-	}
-	w.WriteHeader(http.StatusBadRequest)
-	log.Println("bad request")
-}
-
-func webHookEventHandler(w http.ResponseWriter, r *http.Request) {
-	var notification webhooks.WebhookMessage
-	defer r.Body.Close()
-	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&notification)
-	log.Println(notification)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		log.Println(err)
-		return
-	} else {
-		w.WriteHeader(http.StatusAccepted)
-	}
-
-}
-
 func main() {
 	router := httprouter.New()
+
+	// verifyHandler1
+	verifyHandler1 := hooks.VerifySubscriptionHandler(VerifyFn("mytesttoken"))
+	router.Handler(http.MethodGet, "/webhooks", verifyHandler1)
 	/*
-		// verifyHandler1
-		verifyHandler1 := hooks.VerifySubscriptionHandler(VerifyFn("mytesttoken"))
-		router.Handler(http.MethodGet, "/webhooks", verifyHandler1)
 		// verifyHandler2
 		verifier := &verifier{
 			secret: "mytesttoken",
@@ -127,16 +85,11 @@ func main() {
 
 		verifyHandler2 := hooks.VerifySubscriptionHandler(verifier.Verify)
 		router.Handler(http.MethodGet, "/webhooks", verifyHandler2)
+
 	*/
-
-	router.HandlerFunc(http.MethodGet, "/webhooks", verifyWebhookHandler)
-
-	// This is the Event Handler Implementation
-	// handler := &handler{}
-	// listener := hooks.NewEventListener(handler)
-	// router.Handler(http.MethodPost, "/webhooks", listener)
-
-	router.HandlerFunc(http.MethodPost, "/webhooks", webHookEventHandler)
+	handler := &handler{}
+	listener := hooks.NewEventListener(handler)
+	router.Handler(http.MethodPost, "/webhooks", listener)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
