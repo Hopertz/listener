@@ -21,6 +21,8 @@ jobs:
           echo "export GOPRIVATE=github.com/piusalfred/whatsapp" >> $GITHUB_ENV
           echo "export GITHUB_TOKEN=${{ secrets.PAT }}" >> $GITHUB_ENV
     - name: Test
+      env:
+         GITHUB_TOKEN: ${{ secrets.PAT }}
       run: go test -v ./...
       
     - name: Build
