@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/julienschmidt/httprouter"
 	hooks "github.com/piusalfred/whatsapp/webhooks"
@@ -42,6 +44,30 @@ func VerifyFn(secret string) hooks.SubscriptionVerifier {
 	}
 }
 
+func HandleNotificationError(ctx context.Context, writer http.ResponseWriter, request *http.Request, err error) error {
+	if err != nil {
+		log.Printf("HandleError: %+v\n", err)
+		return err
+	}
+
+	log.Printf("HandleError: NIL")
+	return nil
+}
+
+
+
+func HandleGeneralNotification(ctx context.Context, writer http.ResponseWriter,notification *hooks.Notification, HandleNotificationError) error {
+	os.Stdout.WriteString("HandleEvent")
+	jsonb, err := json.Marshal(notification)
+	if err != nil {
+		return err
+	}
+	// print the string representation of the json
+	//os.Stdout.WriteString(string(jsonb))
+	log.Printf("\n%s\n", string(jsonb))
+	writer.WriteHeader(http.StatusOK)
+	return nil
+}
 
 func main() {
 	router := httprouter.New()
@@ -60,8 +86,10 @@ func main() {
 		router.Handler(http.MethodGet, "/webhooks", verifyHandler2)
 
 	*/
-	listener := hooks.NewEventListener().Handle()
-	router.Handler(http.MethodPost, "/webhooks", listener)
+	listenerOptFunc := hooks.WithGenericNotificationHandler(HandleGeneralNotification)
+	listener := hooks.NewEventListener()
+	listenerOptFunc(listener)
+	router.Handler(http.MethodPost, "/webhooks", listener.Handle())
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
