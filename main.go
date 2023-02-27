@@ -44,31 +44,6 @@ func VerifyFn(secret string) hooks.SubscriptionVerifier {
 	}
 }
 
-type handler struct {
-}
-
-func (h *handler) HandleError(ctx context.Context, writer http.ResponseWriter, request *http.Request, err error) error {
-	if err != nil {
-		log.Printf("HandleError: %+v\n", err)
-		return err
-	}
-
-	log.Printf("HandleError: NIL")
-	return nil
-}
-
-func (h *handler) HandleEvent(ctx context.Context, writer http.ResponseWriter, request *http.Request, notification *hooks.Notification) error {
-	os.Stdout.WriteString("HandleEvent")
-	jsonb, err := json.Marshal(notification)
-	if err != nil {
-		return err
-	}
-	// print the string representation of the json
-	//os.Stdout.WriteString(string(jsonb))
-	log.Printf("\n%s\n", string(jsonb))
-	writer.WriteHeader(http.StatusOK)
-	return nil
-}
 
 func main() {
 	router := httprouter.New()
@@ -87,8 +62,7 @@ func main() {
 		router.Handler(http.MethodGet, "/webhooks", verifyHandler2)
 
 	*/
-	handler := &handler{}
-	listener := hooks.NewEventListener(handler)
+	listener := hooks.NewEventListener().handle()
 	router.Handler(http.MethodPost, "/webhooks", listener)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
