@@ -2,12 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"io"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/julienschmidt/httprouter"
 	hooks "github.com/piusalfred/whatsapp/webhooks"
@@ -62,7 +60,7 @@ func main() {
 		router.Handler(http.MethodGet, "/webhooks", verifyHandler2)
 
 	*/
-	listener := hooks.NewEventListener().handle()
+	listener := hooks.NewEventListener().Handle()
 	router.Handler(http.MethodPost, "/webhooks", listener)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
