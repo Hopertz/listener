@@ -56,7 +56,7 @@ func VerifyFn(secret string) hooks.SubscriptionVerifier {
 
 
 
-func HandleGeneralNotification(ctx context.Context, writer http.ResponseWriter,notification *hooks.Notification, hooks.NotificationErrorHandler) error {
+func HandleGeneralNotification(ctx context.Context, writer http.ResponseWriter,notification *hooks.Notification, notificationErrorHandler hooks.NotificationErrorHandler) error {
 	os.Stdout.WriteString("HandleEvent")
 	jsonb, err := json.Marshal(notification)
 	if err != nil {
