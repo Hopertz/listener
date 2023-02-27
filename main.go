@@ -44,19 +44,19 @@ func VerifyFn(secret string) hooks.SubscriptionVerifier {
 	}
 }
 
-func HandleNotificationError(ctx context.Context, writer http.ResponseWriter, request *http.Request, err error) error {
-	if err != nil {
-		log.Printf("HandleError: %+v\n", err)
-		return err
-	}
+// func HandleNotificationError(ctx context.Context, writer http.ResponseWriter, request *http.Request, err error) error {
+// 	if err != nil {
+// 		log.Printf("HandleError: %+v\n", err)
+// 		return err
+// 	}
 
-	log.Printf("HandleError: NIL")
-	return nil
-}
+// 	log.Printf("HandleError: NIL")
+// 	return nil
+// }
 
 
 
-func HandleGeneralNotification(ctx context.Context, writer http.ResponseWriter,notification *hooks.Notification, HandleNotificationError) error {
+func HandleGeneralNotification(ctx context.Context, writer http.ResponseWriter,notification *hooks.Notification, hooks.NotificationErrorHandler) error {
 	os.Stdout.WriteString("HandleEvent")
 	jsonb, err := json.Marshal(notification)
 	if err != nil {
