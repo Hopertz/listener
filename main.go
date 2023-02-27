@@ -88,8 +88,8 @@ func main() {
 	*/
 	listenerOptFunc := hooks.WithGenericNotificationHandler(HandleGeneralNotification)
 	listener := hooks.NewEventListener()
-	listenerOptFunc(listener)
-	router.Handler(http.MethodPost, "/webhooks", listener.Handle())
+	listenerOptFunc(&listener)
+	router.Handler(http.MethodPost, "/webhooks", listener.GenericHandler())
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 
